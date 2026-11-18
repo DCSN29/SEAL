@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Answer Sheet</title>
+<style>
+:root{--bg:#dde2e5;--ink:#1c2226;--box:#262b2f;
+padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.4vh;overflow:hidden}
+h1{margin:0;font-size:clamp(18px,3.4vh,28px);font-weight:700}
+#status{margin:0;min-height:1.5em;font-size:clamp(16px,3vh,24px)}
+
+#counter{display:flex;align-items:center;gap:2vh;font-size:clamp(18px,3.4vh,28px);font-weight:700}
+#counter button{width:clamp(40px,6vh,56px);height:clamp(40px,6vh,56px);border-radius:50%;border:3px solid var(--ink);background:#fff;color:var(--ink);font:700 clamp(22px,3.6vh,32px)/1 system-ui,sans-serif;cursor:pointer}
+#counter button:hover{background:var(--ink);color:#fff}
+#counter button:focus-visible{outline:4px solid #2a6df4;outline-offset:3px}
+#count{min-width:1.6em;text-align:center}
+
+.light{display:flex;flex-direction:column;gap:2vh;padding:3vh;border-radius:calc(var(--d) * .6);background:var(--box);box-shadow:0 1.5vh 4vh rgba(0,0,0,.3);--d:min(20vh,52vw)}
+.lamp{width:var(--d);height:var(--d);border-radius:50%;border:0;padding:0;cursor:pointer;background:var(--c);color:var(--fg);font:800 calc(var(--d) * .5)/1 system-ui,sans-serif;display:grid;place-items:center;transition:opacity .3s,transform .3s,box-shadow .3s}
+.lamp:hover{transform:scale(1.04)}
+.lamp:focus-visible{outline:4px solid #2a6df4;outline-offset:4px}
+.light.has-answer .lamp{opacity:.28}
+.light.has-answer .lamp.chosen{opacity:1;box-shadow:0 0 5vh 1.4vh var(--c)}
+
+#zoom{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4vh;background:var(--c);color:var(--fg);
+clip-path:circle(0 at var(--x,50%) var(--y,50%));visibility:hidden;transition:clip-path .65s cubic-bezier(.7,0,.2,1),visibility 0s .65s}
+#zoom.open{clip-path:circle(150vmax at var(--x,50%) var(--y,50%));visibility:visible;transition:clip-path .65s cubic-bezier(.7,0,.2,1)}
+#big{font:800 min(55vw,48vh)/1 system-ui,sans-serif}
+#done{font:inherit;font-size:clamp(18px,3vh,26px);padding:1.4vh 4vh;border-radius:999px;border:3px solid var(--fg);background:transparent;color:var(--fg);cursor:pointer}
+#done:focus-visible{outline:4px solid var(--fg);outline-offset:4px}
+@media (prefers-reduced-motion:reduce){#zoom,#zoom.open,.lamp{transition:none}}
+</style>
+</head>
+<body>
+<div id="counter">
+  <span>Correct:</span>
+  <button id="minus" aria-label="Remove one correct answer">&minus;</button>
+  <span id="count" aria-live="polite">0</span>
+  <button id="plus" aria-label="Add one correct answer">+</button>
+</div>
+<h1>Tap your answer</h1>
+<p id="status" aria-live="polite"></p>
+
+<div class="light" id="light">
+  <button class="lamp" data-k="A" style="--c:#2fc16a;--fg:#fff" aria-label="Answer A, green">A</button>
+  <button class="lamp" data-k="B" style="--c:#f5c518;--fg:#1c2226" aria-label="Answer B, yellow">B</button>
+  <button class="lamp" data-k="C" style="--c:#e5383b;--fg:#fff" aria-label="Answer C, red">C</button>
+</div>
+
+<div id="zoom" aria-live="polite">
+  <div id="big"></div>
+  <button id="done">Done answering</button>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const zoom = $("zoom"), lamps = document.querySelectorAll(".lamp");
+let last = null;
+
+function openZoom(lamp) {
+  const r = lamp.getBoundingClientRect();
+  zoom.style.setProperty("--x", (r.left + r.width / 2) + "px");
+  zoom.style.setProperty("--y", (r.top + r.height / 2) + "px");
+  zoom.style.setProperty("--c", getComputedStyle(lamp).getPropertyValue("--c"));
+  zoom.style.setProperty("--fg", getComputedStyle(lamp).getPropertyValue("--fg"));
+  $("big").textContent = lamp.dataset.k;
+  lamps.forEach(l => l.classList.toggle("chosen", l === lamp));
+  $("light").classList.add("has-answer");
+  $("status").textContent = "Your answer: " + lamp.dataset.k;
+  last = lamp;
+  zoom.classList.add("open");
+  $("done").focus({preventScroll: true});
+}
+
+function closeZoom() {
+  if (!zoom.classList.contains("open")) return;
+  if (last) {
+    const r = last.getBoundingClientRect();
+    zoom.style.setProperty("--x", (r.left + r.width / 2) + "px");
+    zoom.style.setProperty("--y", (r.top + r.height / 2) + "px");
+  }
+  zoom.classList.remove("open");
+  lamps.forEach(l => l.classList.remove("chosen"));
+  $("light").classList.remove("has-answer");
+  $("status").textContent = "";
+  if (last) last.focus({preventScroll: true});
+}
+
+lamps.forEach(l => l.onclick = () => openZoom(l));
+$("done").onclick = closeZoom;
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeZoom(); });
+let correct = 0;
+function setCount(n) { correct = Math.max(0, n); $("count").textContent = correct; }
+$("plus").onclick = () => setCount(correct + 1);
+$("minus").onclick = () => setCount(correct - 1);
+</script>
+</body>
+</html>
