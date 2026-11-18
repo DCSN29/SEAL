@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fahrenheit 451 in Ten Scenes</title>
+<link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Courier+Prime&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--char:#130b08;--ember:#ff6a1a;--flame:#ffc233;--ash:#eadfcc;--blood:#8e1b0c;--panel:#21130e;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--char);color:var(--ash);font-family:'Courier Prime','Courier New',monospace}
+#stage{position:relative;height:100%;max-width:1100px;margin:0 auto;display:flex;flex-direction:column;overflow:hidden}
+canvas{position:absolute;inset:0;width:100%;height:100%}
+#frame{position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;padding:clamp(20px,5vw,64px);z-index:2;pointer-events:none}
+#tag{color:var(--flame);font-size:clamp(13px,2vw,16px);margin-bottom:10px;min-height:1.4em}
+#big{font-family:'Abril Fatface',Georgia,serif;font-weight:400;font-size:clamp(46px,12vw,124px);line-height:.95;margin:0 0 20px;color:var(--ash);
+text-shadow:0 0 12px rgba(255,106,26,.7),0 -6px 28px rgba(255,194,51,.5);animation:flick 1.6s infinite alternate}
+@keyframes flick{0%{text-shadow:0 0 10px rgba(255,106,26,.6),0 -4px 22px rgba(255,194,51,.4)}100%{text-shadow:0 0 18px rgba(255,106,26,.9),0 -10px 36px rgba(255,194,51,.6)}}
+#cap{font-size:clamp(17px,2.5vw,25px);line-height:1.5;max-width:30em;min-height:7em;background:rgba(19,11,8,.55);padding:4px 0}
+.swap{animation:cut .6s ease-out}
+@keyframes cut{0%{opacity:0;filter:blur(8px);transform:translateY(14px)}100%{opacity:1;filter:none;transform:none}}
+#bar{position:relative;z-index:3;height:4px;background:var(--panel)}
+#bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blood),var(--ember),var(--flame))}
+#ctl{position:relative;z-index:3;display:flex;gap:10px;align-items:center;padding:12px clamp(16px,4vw,40px);background:var(--panel);flex-wrap:wrap}
+button{font:inherit;color:var(--ash);background:transparent;border:1px solid #6b4a3a;padding:8px 14px;cursor:pointer;border-radius:2px}
+button:hover{border-color:var(--flame)} button:focus-visible{outline:2px solid var(--flame);outline-offset:2px}
+#count{margin-left:auto;color:#a88b78;font-size:14px}
+#start{position:absolute;inset:0;z-index:9;background:var(--char);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:16px;padding:24px}
+#start h1{font-family:'Abril Fatface',Georgia,serif;font-weight:400;font-size:clamp(48px,13vw,130px);margin:0;line-height:.95;color:var(--ember);text-shadow:0 0 30px rgba(255,106,26,.6)}
+#start p{color:#b9a08d;max-width:27em;margin:0}
+#start button{background:var(--ember);border-color:var(--ember);color:#1a0a04;font-size:18px;padding:12px 30px}
+@media (prefers-reduced-motion:reduce){#big,.swap{animation:none}}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="start">
+    <h1>Fahrenheit 451</h1>
+    <p>A ten-scene summary of Ray Bradbury’s novel. Turn your sound on for the fire.</p>
+    <button id="go">Light it</button>
+  </div>
+  <canvas id="cv" aria-hidden="true"></canvas>
+  <div id="frame">
+    <div id="tag"></div>
+    <h2 id="big"></h2>
+    <div id="cap" aria-live="polite"></div>
+  </div>
+  <div id="bar"><i id="fill"></i></div>
+  <div id="ctl">
+    <button id="prev">Back</button><button id="pp">Pause</button><button id="next">Next</button><button id="snd">Fire sound: on</button>
+    <span id="count"></span>
+  </div>
+</div>
+<script>
+const S=[
+["Ray Bradbury, 1953","451°F",1.0,"Four hundred fifty-one degrees Fahrenheit is the temperature at which book paper catches fire and burns. In this future America, owning a book is a crime."],
+["Guy Montag","Firemen start fires",0.8,"Montag is a fireman, but his job is to burn books and the houses that hide them. He loves the work, the flames and the blackened pages, and he has never questioned it."],
+["The society","Numb and entertained",0.5,"People live in front of giant wall-sized screens and wear tiny radios in their ears. Nobody thinks deeply or talks for long. Montag’s wife Mildred barely notices when she nearly dies from an overdose."],
+["Clarisse","Are you happy?",0.4,"A teenage neighbor, Clarisse, notices things like dew and sunsets, and she asks Montag whether he is happy. He realizes he is not. Soon after, she disappears, and he learns she was killed by a car."],
+["A woman’s choice","She burns with them",1.0,"On a raid, an old woman refuses to leave her books and burns with them. Shaken, Montag secretly takes one book home. He starts to wonder what is inside them that is worth dying for."],
+["Captain Beatty","Why books were banned",0.7,"Captain Beatty, his boss, explains that books were never banned by the government alone. People wanted comfort, shorter attention and no offence, and books made everyone feel uneasy. Beatty has read them all, and that makes him dangerous."],
+["Faber","The old professor",0.4,"Montag seeks out Faber, a retired English professor who agrees that books matter. Faber gives him an earpiece so they can talk in secret while Montag tries to fight back from inside the system."],
+["Betrayal","Burn your own house",1.0,"Mildred’s friends report him, and Beatty makes Montag burn his own house. Montag turns the flamethrower on Beatty, kills him, and flees the city."],
+["The chase","The Mechanical Hound",0.8,"A robot hound hunts him through the streets, and Montag escapes by wading down a river. He finds a band of wandering exiles, the Book People, who each memorize one book so it can never be destroyed."],
+["The ending","From the ashes",1.0,"Bombers destroy the city in seconds, and the war is over. Montag and the exiles walk toward the ruins, ready to rebuild. Like the phoenix, a culture can rise again from its ashes, as long as someone remembers."]
+];
+const $=id=>document.getElementById(id);
+let i=-1,playing=false,sound=true,timer=null,typer=null,t0=0,dur=8000,heat=.8;
+// ---------- fire canvas ----------
+const cv=$('cv'),cx=cv.getContext('2d');let W,H,P=[],books=[];
+function size(){const r=cv.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);W=cv.width=r.width*d;H=cv.height=r.height*d}
+addEventListener('resize',size);size();
+const rm=matchMedia('(prefers-reduced-motion:reduce)').matches;
+function spawn(){const n=(rm?3:9)*(0.4+heat);for(let k=0;k<n;k++){const x=Math.random()*W;P.push({x,y:H+10,vx:(Math.random()-.5)*1.2*W/900,vy:-(1.5+Math.random()*3.5)*H/700*(0.6+heat*.6),l:1,s:(26+Math.random()*50)*W/1000,e:Math.random()<.07})}}
+function dropBook(){books.push({x:W*(.15+Math.random()*.7),y:-60,v:0,w:W*.06,h:W*.08,rot:(Math.random()-.5)*.8,burn:0})}
+function frame(){
+  cx.globalCompositeOperation='source-over';cx.fillStyle='rgba(19,11,8,.35)';cx.fillRect(0,0,W,H);
+  const g=cx.createLinearGradient(0,H*.6,0,H);g.addColorStop(0,'rgba(142,27,12,0)');g.addColorStop(1,`rgba(255,106,26,${.15+heat*.25})`);cx.fillStyle=g;cx.fillRect(0,H*.6,W,H*.4);
+  spawn();cx.globalCompositeOperation='lighter';
+  for(let k=P.length-1;k>=0;k--){const p=P[k];p.x+=p.vx+Math.sin(p.y*.01+k)*.6;p.y+=p.vy;p.l-=p.e?.004:.012;
+    if(p.l<=0){P.splice(k,1);continue}
+    if(p.e){cx.fillStyle=`rgba(255,${160+p.l*80|0},60,${p.l})`;cx.fillRect(p.x,p.y,3*W/900,3*W/900);continue}
+    const r=p.s*p.l+4,gr=cx.createRadialGradient(p.x,p.y,0,p.x,p.y,r);
+    gr.addColorStop(0,`rgba(255,${200*p.l+40|0},60,${.38*p.l})`);gr.addColorStop(.5,`rgba(255,100,20,${.2*p.l})`);gr.addColorStop(1,'rgba(142,27,12,0)');
+    cx.fillStyle=gr;cx.beginPath();cx.arc(p.x,p.y,r,0,7);cx.fill()}
+  cx.globalCompositeOperation='source-over';
+  for(let k=books.length-1;k>=0;k--){const b=books[k];b.v+=.35*H/700;b.y+=b.v;if(b.y>H*.78){b.burn+=.03;b.y=H*.78;b.v=0;for(let j=0;j<3;j++)P.push({x:b.x+Math.random()*b.w,y:b.y,vx:(Math.random()-.5)*2,vy:-3-Math.random()*4,l:1,s:40*W/1000,e:Math.random()<.4})}
+    cx.save();cx.translate(b.x,b.y);cx.rotate(b.rot);const c=Math.max(0,1-b.burn);
+    cx.fillStyle=`rgb(${60+c*90|0},${20+c*20|0},${15})`;cx.globalAlpha=Math.max(0,1-b.burn*.8);cx.fillRect(0,0,b.w,b.h);cx.fillStyle='rgba(234,223,204,'+(.8*c)+')';cx.fillRect(b.w*.1,b.h*.08,b.w*.8,b.h*.06);cx.restore();
+    if(b.burn>1.3)books.splice(k,1)}
+  if(playing&&i>=0){const p=Math.min(1,(performance.now()-t0)/dur);$('fill').style.width=((i+p)/S.length*100)+'%'}
+  requestAnimationFrame(frame)}
+frame();
+// ---------- fire sound (synthesized) ----------
+let ac,master,roar,crk;
+function noise(sec,brown){const b=ac.createBuffer(1,ac.sampleRate*sec,ac.sampleRate),d=b.getChannelData(0);let l=0;for(let k=0;k<d.length;k++){const w=Math.random()*2-1;if(brown){l=(l+.02*w)/1.02;d[k]=l*3.5}else d[k]=w}return b}
+function initAudio(){
+  ac=new (window.AudioContext||window.webkitAudioContext)();master=ac.createGain();master.gain.value=sound?1:0;master.connect(ac.destination);
+  const s=ac.createBufferSource();s.buffer=noise(3,true);s.loop=true;const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=700;
+  roar=ac.createGain();roar.gain.value=.35;s.connect(lp).connect(roar).connect(master);s.start();
+  (function pop(){if(ac.state==='running'&&sound){const n=ac.createBufferSource();n.buffer=noise(.06,false);const hp=ac.createBiquadFilter();hp.type='highpass';hp.frequency.value=1500+Math.random()*3000;
+    const g=ac.createGain(),t=ac.currentTime,v=(.15+Math.random()*.5)*(.5+heat*.5);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+.02+Math.random()*.05);n.connect(hp).connect(g).connect(master);n.start(t)}
+    setTimeout(pop,40+Math.random()*(380-heat*200))})();
+}
+function whoosh(){if(!ac)return;const n=ac.createBufferSource();n.buffer=noise(1.4,true);const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1200;const g=ac.createGain(),t=ac.currentTime;
+  g.gain.setValueAtTime(.001,t);g.gain.exponentialRampToValueAtTime(1.2,t+.25);g.gain.exponentialRampToValueAtTime(.001,t+1.4);n.connect(lp).connect(g).connect(master);n.start(t)}
+// ---------- scenes ----------
+function show(n){
+  clearTimeout(timer);clearInterval(typer);
+  i=(n+S.length)%S.length;const[s,b,h,c]=S[i];heat=h;
+  $('tag').textContent=s;$('big').textContent=b;
+  ['tag','big'].forEach(k=>{$(k).classList.remove('swap');void $(k).offsetWidth;$(k).classList.add('swap')});
+  $('count').textContent=(i+1)+" / "+S.length;
+  if(roar)roar.gain.setTargetAtTime(.18+h*.3,ac.currentTime,.4);
+  whoosh();for(let k=0;k<2+Math.round(h*2);k++)setTimeout(dropBook,k*350);
+  const cap=$('cap');cap.textContent='';let k=0;dur=Math.max(7500,c.length*60);
+  typer=setInterval(()=>{k+=2;cap.textContent=c.slice(0,k);if(k>=c.length)clearInterval(typer)},Math.min(40,(dur*.6)/(c.length/2)));
+  t0=performance.now();if(playing)timer=setTimeout(()=>show(i+1),dur);
+}
+$('go').onclick=()=>{$('start').style.display='none';initAudio();ac.resume();playing=true;show(0)};
+$('pp').onclick=()=>{playing=!playing;$('pp').textContent=playing?'Pause':'Play';if(playing){ac&&ac.resume();show(i)}else{clearTimeout(timer);ac&&ac.suspend()}};
+$('next').onclick=()=>show(i+1);$('prev').onclick=()=>show(i-1);
+$('snd').onclick=()=>{sound=!sound;$('snd').textContent='Fire sound: '+(sound?'on':'off');if(master)master.gain.setTargetAtTime(sound?1:0,ac.currentTime,.05)};
+</script>
+</body>
+</html>

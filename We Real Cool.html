@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>We Real Cool</title>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Karla:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--ink:#0b0f0d;--felt:#0f3d2a;--wood:#4a2a14;--amber:#ffb23e;--cream:#f3ead7;--panel:#101714;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--ink);color:var(--cream);font-family:'Karla',system-ui,sans-serif;font-weight:500}
+#stage{position:relative;height:100%;max-width:1180px;margin:0 auto;display:flex;flex-direction:column;overflow:hidden;background:radial-gradient(ellipse at 70% 55%,#173628,var(--ink) 75%)}
+#frame{position:relative;flex:1;overflow:hidden}
+#txt{position:relative;z-index:2;width:48%;height:100%;display:flex;flex-direction:column;justify-content:center;padding:clamp(18px,4vw,56px)}
+#tag{font-size:clamp(13px,1.7vw,17px);color:var(--amber);margin-bottom:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+#big{font-family:'Bungee',Impact,sans-serif;font-weight:400;font-size:clamp(32px,5.4vw,66px);line-height:1.05;margin:0 0 20px}
+#cap{font-size:clamp(17px,2.1vw,24px);line-height:1.5;min-height:6em}
+.f{opacity:0;animation:fade .45s ease forwards}
+@keyframes fade{to{opacity:1}}
+.sw{animation:fade .45s ease both}
+#fig{position:absolute;right:0;bottom:0;width:66%;height:94%;z-index:1}
+#bar{height:4px;background:var(--panel)}#bar i{display:block;height:100%;width:0;background:var(--amber)}
+#ctl{display:flex;gap:10px;align-items:center;padding:12px clamp(16px,4vw,40px);background:var(--panel);flex-wrap:wrap}
+button{font:inherit;font-weight:700;color:var(--cream);background:transparent;border:1px solid #476055;padding:7px 14px;cursor:pointer;border-radius:2px}
+button:hover{border-color:var(--amber)}button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+#count{margin-left:auto;color:#86a094;font-size:14px}
+#start{position:absolute;inset:0;z-index:9;background:radial-gradient(ellipse at 50% 45%,#173628,var(--ink));display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:28px;padding:24px}
+#start h1{font-family:'Bungee',Impact,sans-serif;font-weight:400;font-size:clamp(46px,12vw,128px);margin:0;line-height:1;color:var(--amber);text-shadow:0 0 28px rgba(255,178,62,.5)}
+#start button{background:var(--amber);color:#1b1206;border-color:var(--amber);font-size:18px;padding:11px 32px}
+@media (max-width:720px){#txt{width:100%;justify-content:flex-start;padding-top:18px}#fig{width:100%;height:48%}#cap{min-height:0}}
+@media (prefers-reduced-motion:reduce){.f,.sw{animation:none;opacity:1}}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="start"><h1>We Real Cool</h1><button id="go">Play</button></div>
+  <div id="frame">
+    <div id="txt"><div id="tag"></div><h2 id="big"></h2><div id="cap" aria-live="polite"></div></div>
+    <svg id="fig" viewBox="0 0 620 430" preserveAspectRatio="xMaxYMax meet" aria-hidden="true"></svg>
+  </div>
+  <div id="bar"><i id="fill"></i></div>
+  <div id="ctl"><button id="prev">Back</button><button id="pp">Pause</button><button id="next">Next</button><span id="count"></span></div>
+</div>
+<script>
+const B=['#f2c230','#1f5fbf','#d33b2c','#6a3fa0','#e8762b','#1f8a4c','#7a1f2b','#151515'];
+function table(act,i,ghost){
+  let balls='';
+  for(let k=0;k<8;k++){const x=72+k*68,y=270,on=act==='all'||act.includes(k),gh=ghost&&k<7;
+    if(gh)balls+=`<circle cx="${x}" cy="${y}" r="22" fill="none" stroke="#f3ead7" stroke-opacity=".45" stroke-dasharray="4 4" stroke-width="2"/>`;
+    else{const hi=on&&act!=='all';balls+=`<g opacity="${on?1:.25}"><circle cx="${x}" cy="${y}" r="${hi?27:22}" fill="${B[k]}"/><circle cx="${x}" cy="${y}" r="${hi?13:10}" fill="#f3ead7"/><text x="${x}" y="${y+(hi?6:4)}" text-anchor="middle" font-size="${hi?17:12}" font-weight="700" fill="#111">${k+1}</text>${hi?`<circle cx="${x}" cy="${y}" r="35" fill="none" stroke="#ffb23e" stroke-width="3"/>`:''}</g>`}}
+  const pk=[[48,150],[310,142],[572,150],[48,390],[310,398],[572,390]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="17" fill="#050806"/>`).join('');
+  const sign=`<g opacity="${ghost?.3:1}"><rect x="130" y="22" width="360" height="62" rx="6" fill="#120c04" stroke="#ffb23e" stroke-width="3"/><text x="310" y="65" text-anchor="middle" font-family="Bungee,Impact,sans-serif" font-size="32" fill="#ffb23e" style="filter:drop-shadow(0 0 8px #ffb23e)">GOLDEN SHOVEL</text></g>`;
+  return `<g class="sw">${sign}<rect x="20" y="125" width="580" height="290" rx="22" fill="#4a2a14"/><rect x="38" y="143" width="544" height="254" rx="12" fill="#0f3d2a"/>${pk}${balls}</g>`}
+const S=[
+["Gwendolyn Brooks, 1960","Seven boys at the Golden Shovel","all","The poem is spoken by seven pool players. It shows young people who reject what is expected of them, and it explores rebellion, youth, identity and mortality. It has eight short lines, and each one gets its own numbered ball here.",0],
+["Line 1 of 8","The boast",[0],"The boys open by announcing how cool they are. It is a group boast, and nobody else gets a say.",0],
+["Line 2 of 8","Out of school",[1],"They have walked away from school. The rest of the poem shows where that choice leads.",0],
+["Line 3 of 8","After dark",[2],"They hang around until late at night, out on the streets when most people are home.",0],
+["Line 4 of 8","Sharp shots, sharp attitude",[3],"A double meaning from the pool table: accurate shots, and a fearless, tough attitude.",0],
+["Line 5 of 8","Proud of trouble",[4],"They treat wrongdoing like a song, as if breaking the rules is something to be proud of.",0],
+["Line 6 of 8","Cheap drinks",[5],"A weak, cheap drink. They are playing at being grown men, and picking up vices early.",0],
+["Line 7 of 8","Summer and music",[6],"The season of youth and the sound of jazz. Life feels warm, loud and full of possibility.",0],
+["Line 8 of 8","The 8-ball",[7],"The last line ends it all. Like the 8-ball that ends a game, it brings sudden death with no reason given. The seven players are gone, and only empty spots remain.",1],
+["Major themes","What the poem is about","all","Youth and rebellion. Identity and belonging. Consequences of choices. Social conditions.",0],
+["Literary techniques","How it is built","all","A first-person plural voice. Enjambment. Internal rhyme. Repetition. A jazz-like rhythm with syncopation.",0]
+];
+const $=id=>document.getElementById(id);
+let i=-1,playing=false,timer=null,t0=0,dur=9000;
+function show(n){
+  clearTimeout(timer);
+  i=(n+S.length)%S.length;const[s,b,a,c,g]=S[i];
+  $('tag').textContent=s;$('big').textContent=b;$('fig').innerHTML=table(a,i,g);$('count').textContent=(i+1)+' / '+S.length;
+  ['tag','big'].forEach(k=>{$(k).classList.remove('sw');void $(k).offsetWidth;$(k).classList.add('sw')});
+  const parts=c.split(/(?<=[.!?])\s+/);
+  $('cap').innerHTML=parts.map((p,k)=>`<span class="f" style="animation-delay:${.15+k*.55}s">${p} </span>`).join('');
+  dur=Math.max(6000,c.length*42+parts.length*500);
+  t0=performance.now();if(playing)timer=setTimeout(()=>show(i+1),dur);
+}
+function tick(){if(playing&&i>=0){const p=Math.min(1,(performance.now()-t0)/dur);$('fill').style.width=((i+p)/S.length*100)+'%'}requestAnimationFrame(tick)}tick();
+$('go').onclick=()=>{$('start').style.display='none';playing=true;show(0)};
+$('pp').onclick=()=>{playing=!playing;$('pp').textContent=playing?'Pause':'Play';if(playing)show(i);else clearTimeout(timer)};
+$('next').onclick=()=>show(i+1);$('prev').onclick=()=>show(i-1);
+</script>
+</body>
+</html>

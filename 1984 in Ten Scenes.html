@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>1984 in Ten Scenes</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--ink:#0e1210;--ash:#d8d3c4;--red:#c1272d;--dim:#7d8279;--steel:#1b211e;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:var(--ink);color:var(--ash);font-family:'Special Elite','Courier New',monospace}
+*{box-sizing:border-box}
+#stage{position:relative;height:100%;max-width:1100px;margin:0 auto;display:flex;flex-direction:column;overflow:hidden}
+#scan{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 4px);z-index:5}
+#frame{flex:1;display:flex;flex-direction:column;justify-content:center;padding:clamp(20px,5vw,64px);position:relative}
+#tag{color:var(--dim);font-size:clamp(12px,2vw,15px);margin-bottom:12px;min-height:1.4em}
+#big{font-family:'Archivo Black',Impact,sans-serif;font-size:clamp(44px,12vw,128px);line-height:.95;margin:0 0 20px;color:var(--ash);letter-spacing:-.01em}
+#big.red{color:var(--red)}
+#cap{font-size:clamp(17px,2.6vw,26px);line-height:1.5;max-width:30em;min-height:6em}
+#cap::after{content:"\2588";color:var(--red);animation:b 1s steps(2) infinite}
+@keyframes b{50%{opacity:0}}
+#eye{position:absolute;right:clamp(10px,4vw,50px);top:clamp(10px,4vw,40px);width:clamp(70px,14vw,150px);opacity:.9}
+#eye .iris{animation:look 6s ease-in-out infinite}
+@keyframes look{0%,100%{transform:translateX(-7px)}50%{transform:translateX(7px)}}
+.swap{animation:cut .5s steps(5)}
+@keyframes cut{0%{opacity:0;transform:translateX(-6px)}60%{opacity:.6}100%{opacity:1;transform:none}}
+#bar{height:4px;background:var(--steel)}
+#bar i{display:block;height:100%;width:0;background:var(--red)}
+#ctl{display:flex;gap:10px;align-items:center;padding:12px clamp(16px,4vw,40px);background:var(--steel)}
+button{font:inherit;color:var(--ash);background:transparent;border:1px solid var(--dim);padding:8px 14px;cursor:pointer;border-radius:2px}
+button:hover{border-color:var(--ash)} button:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+#count{margin-left:auto;color:var(--dim);font-size:14px}
+#start{position:absolute;inset:0;z-index:9;background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:18px;padding:24px}
+#start h1{font-family:'Archivo Black',Impact,sans-serif;font-size:clamp(60px,18vw,170px);margin:0;line-height:.9}
+#start p{color:var(--dim);max-width:26em;margin:0}
+#start button{background:var(--red);border-color:var(--red);color:#fff;font-size:18px;padding:12px 28px}
+@media (prefers-reduced-motion:reduce){#eye .iris,.swap,#cap::after{animation:none}}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="start">
+    <h1>1984</h1>
+    <p>A ten-scene summary of George Orwell’s novel. Sound on for narration.</p>
+    <button id="go">Play</button>
+  </div>
+  <div id="frame">
+    <svg id="eye" viewBox="0 0 120 70" aria-hidden="true"><path d="M4 35C28 6 92 6 116 35 92 64 28 64 4 35Z" fill="none" stroke="#c1272d" stroke-width="3"/><g class="iris"><circle cx="60" cy="35" r="18" fill="#c1272d"/><circle cx="60" cy="35" r="7" fill="#0e1210"/></g></svg>
+    <div id="tag"></div>
+    <h2 id="big"></h2>
+    <div id="cap" aria-live="polite"></div>
+  </div>
+  <div id="scan"></div>
+  <div id="bar"><i id="fill"></i></div>
+  <div id="ctl">
+    <button id="prev" aria-label="Previous scene">Back</button>
+    <button id="pp">Pause</button>
+    <button id="next" aria-label="Next scene">Next</button>
+    <button id="snd">Voice: on</button>
+    <span id="count"></span>
+  </div>
+</div>
+<script>
+const S=[
+["Oceania, 1949","BIG BROTHER IS WATCHING YOU",1,"Orwell’s novel imagines London in 1984, a province called Airstrip One in the superstate of Oceania. The Party rules through fear, and posters of Big Brother watch every street."],
+["The world","Endless war",0,"Three superstates fight a war that never ends, and it keeps the population poor, afraid and obedient. The Inner Party rules, the Outer Party obeys, and the proles are left alone and ignored."],
+["Winston Smith","Rewrites the past",0,"Winston works at the Ministry of Truth, altering old newspapers so that history always agrees with whatever the Party says today. He quietly hates it."],
+["A secret diary","Thoughtcrime",1,"Winston buys a notebook and begins to write down his real thoughts. That alone is thoughtcrime, a crime punishable by death, and he knows it."],
+["The Party’s tools","War is Peace",1,"Three slogans: war is peace, freedom is slavery, ignorance is strength. Newspeak shrinks the language so rebellion becomes impossible to think, and doublethink trains people to believe two contradictory things at once. Telescreens watch and listen everywhere."],
+["Julia","A small rebellion",0,"Winston meets Julia, a young woman who also resents the Party. They become lovers, which the Party forbids, and meet in a rented room above Mr. Charrington’s antique shop."],
+["O’Brien","A trusted friend?",0,"Winston believes that O’Brien, a senior Party member, secretly belongs to the Brotherhood, an underground resistance. O’Brien gives them a banned book describing how the Party really works."],
+["Betrayal","Caught",1,"Thought Police burst into the room. Mr. Charrington is one of them, and O’Brien was never a rebel. He had been watching Winston for years."],
+["Room 101","Do it to Julia",1,"In the Ministry of Love, O’Brien breaks Winston, step by step. Finally he is threatened with his worst fear, rats, and he begs them to use Julia instead. His last loyalty is gone."],
+["The end","He loved Big Brother",1,"Winston is released, empty and ashamed. He meets Julia, and neither feels anything. In a cafe he looks at the telescreen and realizes he has come to love Big Brother. The Party has won, and the lesson stays with us: power wants to control truth itself."]
+];
+const $=id=>document.getElementById(id);
+let i=-1,playing=false,voice=true,timer=null,typer=null,t0=0,dur=8000;
+const synth=window.speechSynthesis;
+function show(n){
+  clearTimeout(timer);clearInterval(typer);try{synth&&synth.cancel()}catch(e){}
+  i=(n+S.length)%S.length;const[s,b,red,c]=S[i];
+  $('tag').textContent=s;$('big').textContent=b;$('big').className=red?'red':'';
+  ['tag','big'].forEach(k=>{$(k).classList.remove('swap');void $(k).offsetWidth;$(k).classList.add('swap')});
+  $('count').textContent=(i+1)+" / "+S.length;
+  const cap=$('cap');cap.firstChild&&(cap.textContent='');let k=0;
+  dur=Math.max(7000,c.length*62);
+  typer=setInterval(()=>{k+=2;cap.textContent=c.slice(0,k);if(k>=c.length)clearInterval(typer)},Math.min(40,(dur*.6)/(c.length/2)));
+  t0=performance.now();
+  let spoke=false;
+  if(voice&&synth&&playing){try{const u=new SpeechSynthesisUtterance(c);u.rate=.95;u.onend=()=>{if(playing)timer=setTimeout(()=>show(i+1),900)};synth.speak(u);spoke=true}catch(e){}}
+  if(!spoke&&playing)timer=setTimeout(()=>show(i+1),dur);
+}
+function tick(){
+  if(playing&&i>=0){const p=Math.min(1,(performance.now()-t0)/(dur+900));$('fill').style.width=((i+p)/S.length*100)+'%'}
+  requestAnimationFrame(tick)
+}
+$('go').onclick=()=>{$('start').style.display='none';playing=true;show(0)};
+$('pp').onclick=()=>{playing=!playing;$('pp').textContent=playing?'Pause':'Play';if(playing)show(i);else{clearTimeout(timer);try{synth.cancel()}catch(e){}}};
+$('next').onclick=()=>show(i+1);$('prev').onclick=()=>show(i-1);
+$('snd').onclick=()=>{voice=!voice;$('snd').textContent='Voice: '+(voice?'on':'off');if(playing)show(i)};
+if(!synth){voice=false;$('snd').style.display='none'}
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

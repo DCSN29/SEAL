@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Handmaid’s Tale</title>
+<link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg1:#7a0c12;--bg2:#260306;--cream:#f6e9dd;--red:#d8141e;--floor:#170204;--panel:#1d0306;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg2);color:var(--cream);font-family:'IM Fell English',Georgia,serif}
+#stage{position:relative;height:100%;max-width:1180px;margin:0 auto;display:flex;flex-direction:column;overflow:hidden;background:radial-gradient(ellipse at 70% 40%,var(--bg1),var(--bg2) 75%)}
+#frame{position:relative;flex:1;overflow:hidden}
+#txt{position:relative;z-index:2;width:52%;height:100%;display:flex;flex-direction:column;justify-content:center;padding:clamp(18px,4vw,56px)}
+#tag{font-size:clamp(14px,1.8vw,18px);font-style:italic;color:#f0b3a8;margin-bottom:8px}
+#big{font-family:'Rozha One',Georgia,serif;font-weight:400;font-size:clamp(34px,6.2vw,76px);line-height:1.02;margin:0 0 18px}
+#cap{font-size:clamp(16px,2vw,23px);line-height:1.45;min-height:5.8em}
+#prec{margin-top:14px;padding:10px 14px;border-left:4px solid var(--cream);background:rgba(0,0,0,.38);font-size:clamp(14px,1.7vw,19px);line-height:1.4;font-style:italic;opacity:0}
+#prec b{font-style:normal;font-family:'Rozha One',serif;font-weight:400;color:#ff7b72}
+#prec.on{animation:in 1s forwards}
+@keyframes in{to{opacity:1}}
+#fig{position:absolute;right:0;bottom:0;width:62%;height:96%;z-index:1}
+.sw{animation:rise .8s ease-out}
+@keyframes rise{from{opacity:0}to{opacity:1}}
+
+#bar{height:4px;background:var(--panel)}#bar i{display:block;height:100%;width:0;background:var(--cream)}
+#ctl{display:flex;gap:10px;align-items:center;padding:12px clamp(16px,4vw,40px);background:var(--panel);flex-wrap:wrap}
+button{font:inherit;color:var(--cream);background:transparent;border:1px solid #8a4a44;padding:7px 14px;cursor:pointer;border-radius:2px}
+button:hover{border-color:var(--cream)}button:focus-visible{outline:2px solid var(--cream);outline-offset:2px}
+#count{margin-left:auto;color:#c99b94;font-size:14px}
+#start{position:absolute;inset:0;z-index:9;background:radial-gradient(ellipse at 50% 40%,var(--bg1),var(--bg2));display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:26px;padding:24px}
+#start h1{font-family:'Rozha One',Georgia,serif;font-weight:400;font-size:clamp(46px,11vw,120px);margin:0;line-height:1}
+#start button{background:var(--cream);color:#4a0509;border-color:var(--cream);font-size:18px;padding:11px 30px}
+@media (max-width:720px){#txt{width:100%;justify-content:flex-start;padding-top:18px}#fig{width:100%;height:46%}#cap{min-height:0}}
+@media (prefers-reduced-motion:reduce){.sw{animation:none}}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="start"><h1>The Handmaid’s Tale</h1><button id="go">Play</button></div>
+  <div id="frame">
+    <div id="txt">
+      <div id="tag"></div><h2 id="big"></h2><div id="cap" aria-live="polite"></div>
+      <div id="prec"></div>
+    </div>
+    <svg id="fig" viewBox="0 0 620 430" preserveAspectRatio="xMaxYMax meet" aria-hidden="true"></svg>
+  </div>
+  <div id="bar"><i id="fill"></i></div>
+  <div id="ctl"><button id="prev">Back</button><button id="pp">Pause</button><button id="next">Next</button><span id="count"></span></div>
+</div>
+<script>
+const SK='#e8c9b0';
+const CL={
+ H:{n:'Handmaid',c:'#d8141e',d:'#8e0c13'},
+ A:{n:'Aunt',c:'#8b7a4a',d:'#5c4f2d'},
+ W:{n:'Wife',c:'#2b78a3',d:'#1b4d6b'},
+ M:{n:'Martha',c:'#58783d',d:'#38502a'}};
+function fig(t,x,s){
+  if(t==='C')return `<g class="bob" transform="translate(${x},392) scale(${s})"><path d="M-36 0V-150Q0 -165 36 -150V0Z" fill="#0b0b0d"/><path d="M-12 -150L0 -80 12 -150Z" fill="#f2ede4"/><path d="M-3 -146L0 -100 3 -146Z" fill="#7a0c12"/><circle cx="0" cy="-176" r="19" fill="${SK}"/><path d="M-20 -182Q0 -204 20 -182Q10 -190 -20 -182Z" fill="#9a9a9a"/><circle cx="-6" cy="-176" r="1.6" fill="#222"/><circle cx="6" cy="-176" r="1.6" fill="#222"/><text y="22" text-anchor="middle" font-size="${13/s}" fill="#f6e9dd" font-style="italic">Commander</text></g>`;
+  const o=CL[t];
+  let head=`<circle cx="0" cy="-172" r="15" fill="${SK}"/>`;
+  if(t==='H')head=`<path d="M-30 -188Q-40 -158 -12 -154H12Q40 -158 30 -188Q0 -214 -30 -188Z" fill="#fff"/><ellipse cx="0" cy="-170" rx="9" ry="12" fill="#3a1010"/>`;
+  if(t==='A')head+=`<path d="M-15 -176Q0 -196 15 -176Q0 -186 -15 -176Z" fill="#3a2a16"/><path d="M42 -60L52 -150" stroke="#222" stroke-width="3"/>`;
+  if(t==='W')head+=`<path d="M-20 -178Q0 -200 20 -178L24 -140H-24Z" fill="${o.c}" opacity=".85"/>`;
+  if(t==='M')head+=`<path d="M-15 -176Q0 -194 15 -176L15 -168H-15Z" fill="#d9d2b4"/>`;
+  return `<g class="bob" transform="translate(${x},392) scale(${s})"><path d="M-34 0L-22 -150Q0 -163 22 -150L34 0Z" fill="${o.c}"/><path d="M-34 0L-30 -30H30L34 0Z" fill="${o.d}"/>${head}<text y="22" text-anchor="middle" font-size="${13/s}" fill="#f6e9dd" font-style="italic">${o.n}</text></g>`;
+}
+function hang(t,x){const o=CL[t];return `<g transform="translate(${x},330)"><path d="M0 -258V-187" stroke="#2a1a10" stroke-width="3"/><path d="M-34 0L-22 -150Q0 -163 22 -150L34 0Z" fill="${o.c}"/><path d="M-34 0L-30 -30H30L34 0Z" fill="${o.d}"/><rect x="-18" y="0" width="10" height="16" fill="#222"/><rect x="8" y="0" width="10" height="16" fill="#222"/><circle cx="0" cy="-172" r="15" fill="#eee5d8"/></g>`}
+function wall(){return `<g class="sw"><defs><pattern id="br" width="40" height="20" patternUnits="userSpaceOnUse"><rect width="40" height="20" fill="#3a090c"/><path d="M0 0H40M0 10V20M20 0V10" stroke="#1e0305" stroke-width="2" fill="none"/></pattern></defs><rect x="0" y="30" width="620" height="362" fill="url(#br)"/><rect x="130" y="64" width="300" height="8" fill="#1a0f0a"/>${hang('H',190)}${hang('M',280)}${hang('H',370)}<rect x="0" y="392" width="620" height="38" fill="#170204"/>${fig('H',70,1.15)}${fig('C',545,1.7)}</g>`}
+function stage(list){if(list[0]==='X')return wall();const n=list.length,sp=560/n;return `<g class="sw"><rect x="0" y="392" width="620" height="38" fill="#170204"/>`+list.map((f,k)=>{const t=f[0],big=t==='C';return fig(t,40+sp*(k+.5)+(big?0:0),big?1.7:1.15)}).join('')+'</g>'}
+const S=[
+["Gilead","Women lose everything overnight",['H','W','C'],"After a coup, a new regime called Gilead takes over America. Women’s bank accounts are frozen, their jobs are taken, and their property passes to male relatives.","After Iran’s 1979 revolution, women were pushed out of many jobs and made to veil, and the Taliban later banned women from work and school."],
+["The colors","Your cloak is your class",['A','H','W','M'],"Women are sorted by color. Aunts in brown train and punish. Handmaids in red exist to bear children. Wives in blue run the house. Marthas in green cook and clean.","Dress codes have long been used to fix a woman’s place, from Puritan New England to modern mandatory veiling."],
+["Offred","A woman reduced to a womb",['H','C'],"Offred once had a husband, a child and a job. Now she is a Handmaid, and even her name is taken: Of-Fred, the property of her Commander. Her only purpose is to give a child to a ruling couple.","In 1966 Romania banned abortion and contraception to force births, and Argentina’s junta gave babies of detained women to regime families."],
+["The Aunts","Women policing women",['A','H'],"Aunts run the training center and break the Handmaids with cattle prods and shame. Many women are made to enforce the system on other women, so the men never have to.","Footbinding in China was enforced by women, and women served as guards in the Nazi camps."],
+["The Ceremony","Rape, called a duty",['W','H','C'],"Each month the Commander rapes Offred while his Wife holds her in her lap. It is called a religious duty. The Wife is humiliated, and no one can refuse.","The story comes from the Bible (Rachel and Bilhah). Enslaved women in the US were forced to bear children for their owners, and marital rape was still legal in parts of the US until 1993."],
+["Forbidden words","No reading. No writing.",['H','A'],"Women may not read, write or own anything. Even shop signs are just pictures. Offred’s forbidden game of Scrabble with the Commander feels like a dangerous luxury.","Enslaved people in the US were banned from learning to read, and the Taliban closed girls’ schools."],
+["The Commander","Power with a soft voice",['C','H'],"The Commander secretly invites Offred to his study to play games and read old magazines. His kindness hides the truth: she cannot say no, and he can end her life at will.","Under coverture laws, a married woman’s legal identity and property belonged to her husband in England and the US for centuries."],
+["The Colonies","Disposable women",['A','H','W'],"Women who cannot conceive, or who rebel, are called Unwomen. They are exiled to the Colonies to clear toxic waste until they die, or are hidden in secret clubs for the elite.","Ireland’s Magdalene laundries locked up so-called fallen women until 1996, and the Soviet gulags worked prisoners to death."],
+["Salvaging","Hanged in public",['X'],"Women who break the rules are hanged while the Handmaids are forced to watch. The bodies hang on the Wall as a warning to everyone else.","Salem hanged women as witches in 1692, and public executions of women have continued in many places since."],
+["The tape","Her voice survives",['H','A','W','M','C'],"Offred is taken away in a black van, and we never learn whether it is rescue or arrest. Centuries later, scholars find her recorded story, and her voice outlives the regime that tried to erase her.","Atwood has said she put nothing in the book that humans had not already done to one another. Gilead is a warning made from history."]
+];
+const $=id=>document.getElementById(id);
+let i=-1,playing=false,timer=null,typer=null,pt=null,t0=0,dur=9000;
+function show(n){
+  clearTimeout(timer);clearInterval(typer);clearTimeout(pt);
+  i=(n+S.length)%S.length;const[s,b,f,c,p]=S[i];
+  $('tag').textContent=s;$('big').textContent=b;
+  $('fig').innerHTML=stage(f);$('count').textContent=(i+1)+' / '+S.length;
+  ['tag','big'].forEach(k=>{$(k).classList.remove('sw');void $(k).offsetWidth;$(k).classList.add('sw')});
+  const pr=$('prec');pr.className='';pr.innerHTML='<b>Already happened.</b> '+p;
+  const cap=$('cap');cap.textContent='';let k=0;dur=Math.max(10000,(c.length+p.length)*50);
+  typer=setInterval(()=>{k+=2;cap.textContent=c.slice(0,k);if(k>=c.length)clearInterval(typer)},Math.min(40,(dur*.35)/(c.length/2)));
+  pt=setTimeout(()=>pr.className='on',dur*.4);
+  t0=performance.now();if(playing)timer=setTimeout(()=>show(i+1),dur);
+}
+function tick(){if(playing&&i>=0){const p=Math.min(1,(performance.now()-t0)/dur);$('fill').style.width=((i+p)/S.length*100)+'%'}requestAnimationFrame(tick)}tick();
+$('go').onclick=()=>{$('start').style.display='none';playing=true;show(0)};
+$('pp').onclick=()=>{playing=!playing;$('pp').textContent=playing?'Pause':'Play';if(playing)show(i);else clearTimeout(timer)};
+$('next').onclick=()=>show(i+1);$('prev').onclick=()=>show(i-1);
+</script>
+</body>
+</html>

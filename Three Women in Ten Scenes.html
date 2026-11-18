@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Three Women</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg1:#1c3149;--bg2:#0a111c;--cream:#f2ece0;--wife:#e58f6e;--sec:#84acd1;--girl:#c7a4dc;--panel:#0d1622;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg2);color:var(--cream);font-family:'Cormorant Garamond',Georgia,serif;font-weight:500}
+#stage{position:relative;height:100%;max-width:1180px;margin:0 auto;display:flex;flex-direction:column;overflow:hidden;background:radial-gradient(ellipse at 75% 20%,var(--bg1),var(--bg2) 72%)}
+#frame{position:relative;flex:1;overflow:hidden}
+#txt{position:relative;z-index:2;width:50%;height:100%;display:flex;flex-direction:column;justify-content:center;padding:clamp(18px,4vw,56px)}
+#tag{font-size:clamp(15px,1.9vw,20px);font-style:italic;margin-bottom:8px;letter-spacing:.02em}
+#big{font-family:'DM Serif Display',Georgia,serif;font-weight:400;font-size:clamp(36px,6vw,74px);line-height:1.04;margin:0 0 18px}
+#cap{font-size:clamp(18px,2.2vw,26px);line-height:1.42;min-height:6em;font-weight:600}
+#fig{position:absolute;right:0;bottom:0;width:64%;height:96%;z-index:1}
+.sw{animation:in .8s ease-out}
+@keyframes in{from{opacity:0}to{opacity:1}}
+#bar{height:4px;background:var(--panel)}#bar i{display:block;height:100%;width:0;background:var(--cream)}
+#ctl{display:flex;gap:10px;align-items:center;padding:12px clamp(16px,4vw,40px);background:var(--panel);flex-wrap:wrap}
+button{font:inherit;font-weight:600;color:var(--cream);background:transparent;border:1px solid #4b6580;padding:6px 14px;cursor:pointer;border-radius:2px}
+button:hover{border-color:var(--cream)}button:focus-visible{outline:2px solid var(--cream);outline-offset:2px}
+#count{margin-left:auto;color:#8ea4ba;font-size:15px}
+#start{position:absolute;inset:0;z-index:9;background:radial-gradient(ellipse at 50% 35%,var(--bg1),var(--bg2));display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:26px;padding:24px}
+#start h1{font-family:'DM Serif Display',Georgia,serif;font-weight:400;font-size:clamp(52px,13vw,140px);margin:0;line-height:1}
+#start button{background:var(--cream);color:#12202f;border-color:var(--cream);font-size:19px;padding:10px 30px}
+@media (max-width:720px){#txt{width:100%;justify-content:flex-start;padding-top:18px}#fig{width:100%;height:46%}#cap{min-height:0}}
+@media (prefers-reduced-motion:reduce){.sw{animation:none}}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="start"><h1>Three Women</h1><button id="go">Play</button></div>
+  <div id="frame">
+    <div id="txt"><div id="tag"></div><h2 id="big"></h2><div id="cap" aria-live="polite"></div></div>
+    <svg id="fig" viewBox="0 0 620 430" preserveAspectRatio="xMaxYMax meet" aria-hidden="true"></svg>
+  </div>
+  <div id="bar"><i id="fill"></i></div>
+  <div id="ctl"><button id="prev">Back</button><button id="pp">Pause</button><button id="next">Next</button><span id="count"></span></div>
+</div>
+<script>
+const V={W:{n:'The Wife',c:'#e58f6e',x:150},S:{n:'The Secretary',c:'#84acd1',x:310},G:{n:'The Girl',c:'#c7a4dc',x:470}};
+function woman(k,on,i){
+  const v=V[k],sk='#f0dccb';let extra='',hair='';
+  if(k==='W'){hair=`<circle cx="9" cy="-166" r="7" fill="#5a3322"/><path d="M-14 -158Q0 -176 14 -158Q0 -166 -14 -158Z" fill="#5a3322"/>`;
+    if(i<=3)extra=`<ellipse cx="0" cy="-82" rx="23" ry="21" fill="#fff" opacity=".28"/>`;
+    else extra=`<ellipse cx="-4" cy="-98" rx="17" ry="9" fill="#f4efe6" transform="rotate(-18 -4 -98)"/><circle cx="-14" cy="-104" r="6" fill="${sk}"/>`}
+  if(k==='S')hair=`<path d="M-16 -150Q-18 -174 0 -174Q18 -174 16 -150L16 -146H-16Z" fill="#20252e"/>`;
+  if(k==='G'){hair=`<path d="M-15 -152Q-18 -176 0 -176Q18 -176 15 -152L20 -112L10 -112L12 -150H-12L-10 -112L-20 -112Z" fill="#7b5a3a"/>`;
+    if(i>=6)extra=`<g opacity=".55"><ellipse cx="58" cy="-40" rx="17" ry="9" fill="none" stroke="#f4efe6" stroke-dasharray="3 3"/><circle cx="46" cy="-46" r="6" fill="none" stroke="#f4efe6" stroke-dasharray="3 3"/></g>`}
+  return `<g opacity="${on?1:.2}" transform="translate(${v.x},392) scale(1.45)"><path d="M-27 0L-16 -132Q0 -144 16 -132L27 0Z" fill="${v.c}"/><circle cx="0" cy="-156" r="14" fill="${sk}"/>${hair}${extra}<text y="20" text-anchor="middle" font-size="${15/1.45}" fill="#f2ece0" font-style="italic">${v.n}</text></g>`}
+function scene(on,i){
+  return `<g class="sw"><defs><radialGradient id="mg"><stop offset="0" stop-color="#f2ece0" stop-opacity=".35"/><stop offset="1" stop-color="#f2ece0" stop-opacity="0"/></radialGradient></defs><circle cx="520" cy="80" r="110" fill="url(#mg)"/><circle cx="520" cy="80" r="40" fill="#f2ece0" opacity=".92"/><rect x="0" y="392" width="620" height="38" fill="#0a111c"/>`+['W','S','G'].map(k=>woman(k,on.includes(k),i)).join('')+'</g>'}
+const S=[
+["Sylvia Plath, 1962","One ward, three women",'WSG',"Plath wrote this as a poem for three voices, set in a maternity hospital. Three women are there for the same reason, and each pregnancy ends in a very different way."],
+["First voice · The Wife","Waiting to be filled",'W',"The Wife is pregnant and calm, and she feels the baby coming like a force of nature she cannot control. Under the calm she is frightened of what the birth will ask of her."],
+["Second voice · The Secretary","Not one of the lucky",'S',"The Secretary works in an office full of men. She has lost pregnancies before, and she feels her body keeps failing her. She sits among the expectant mothers and feels like an outsider."],
+["Third voice · The Girl","A student, and afraid",'G',"The Girl is young, unmarried and still in school. She did not plan this pregnancy and she hides it. Her fear is shame, and what the world will say."],
+["The Wife","A son arrives",'W',"After a long and painful labor, the Wife gives birth to a son. Her fear turns to wonder, and for a moment she feels whole and astonishingly happy."],
+["The Secretary","The loss",'S',"The Secretary miscarries. She feels numb and empty, and the ward goes on around her as if nothing has happened. Her grief has nowhere to go."],
+["The Girl","A daughter she must leave",'G',"The Girl gives birth to a daughter she cannot keep. She knows she will have to leave her behind, and the baby’s absence stays with her, heavy and quiet."],
+["The ward","Who gets to be happy?",'WSG',"Cries of newborns fill the ward. The Wife is joyful, the Secretary is hollowed out, and the Girl is torn between relief and grief. The same room holds all three, and none of them can fully share it."],
+["The Wife","Going home, afraid",'W',"The Wife leaves with her son, and her joy comes with a new fear. The world outside seems cold and dangerous, and she knows she cannot protect him from all of it."],
+["Three voices","Each walks out alone",'WSG',"The Secretary goes back to a world that has no place for her sorrow. The Girl returns to school with an empty place inside. The Wife takes her son home. The poem gives no easy answer, only three honest voices about what a woman’s body can cost her."]
+];
+const $=id=>document.getElementById(id);
+let i=-1,playing=false,timer=null,typer=null,t0=0,dur=9000;
+function show(n){
+  clearTimeout(timer);clearInterval(typer);
+  i=(n+S.length)%S.length;const[s,b,o,c]=S[i];
+  const tag=$('tag');tag.textContent=s;tag.style.color=o.length===1?V[o].c:'#f2ece0';
+  $('big').textContent=b;$('fig').innerHTML=scene(o,i);$('count').textContent=(i+1)+' / '+S.length;
+  ['tag','big'].forEach(k=>{$(k).classList.remove('sw');void $(k).offsetWidth;$(k).classList.add('sw')});
+  const cap=$('cap');cap.textContent='';let k=0;dur=Math.max(9000,c.length*58);
+  typer=setInterval(()=>{k+=2;cap.textContent=c.slice(0,k);if(k>=c.length)clearInterval(typer)},Math.min(40,(dur*.5)/(c.length/2)));
+  t0=performance.now();if(playing)timer=setTimeout(()=>show(i+1),dur);
+}
+function tick(){if(playing&&i>=0){const p=Math.min(1,(performance.now()-t0)/dur);$('fill').style.width=((i+p)/S.length*100)+'%'}requestAnimationFrame(tick)}tick();
+$('go').onclick=()=>{$('start').style.display='none';playing=true;show(0)};
+$('pp').onclick=()=>{playing=!playing;$('pp').textContent=playing?'Pause':'Play';if(playing)show(i);else clearTimeout(timer)};
+$('next').onclick=()=>show(i+1);$('prev').onclick=()=>show(i-1);
+</script>
+</body>
+</html>
